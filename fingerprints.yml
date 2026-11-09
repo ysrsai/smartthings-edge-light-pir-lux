@@ -1,0 +1,6 @@
+zigbeeManufacturer:
+  - id: "ysrsai-light-pir-lux"
+    deviceLabel: "YSRSAI Light PIR Lux"
+    manufacturer: "YSRSAI"
+    model: "Light-PIR-Lux"
+    deviceProfileName: "light-pir-lux"

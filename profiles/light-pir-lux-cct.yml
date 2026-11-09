@@ -1,0 +1,51 @@
+name: light-pir-lux-cct
+components:
+  - id: main
+    label: Light
+    capabilities:
+      - id: switch
+        version: 1
+      - id: switchLevel
+        version: 1
+      - id: colorTemperature
+        version: 1
+      - id: refresh
+        version: 1
+    categories:
+      - name: Light
+
+  - id: motion
+    label: Motion
+    capabilities:
+      - id: motionSensor
+        version: 1
+
+  - id: illuminance
+    label: Illuminance
+    capabilities:
+      - id: illuminanceMeasurement
+        version: 1
+
+  - id: key1
+    label: Scene Key 1
+    capabilities:
+      - id: button
+        version: 1
+
+  - id: key2
+    label: Scene Key 2
+    capabilities:
+      - id: button
+        version: 1
+
+  - id: key3
+    label: Scene Key 3
+    capabilities:
+      - id: button
+        version: 1
+
+  - id: key4
+    label: Scene Key 4
+    capabilities:
+      - id: button
+        version: 1

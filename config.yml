@@ -1,0 +1,5 @@
+name: "YSRSAI Light PIR Lux 4 Switch Test"
+packageKey: "ysrsai-light-pir-lux-4switch-test"
+description: "Zigbee light with occupancy and illuminance endpoints"
+permissions:
+  zigbee: {}
