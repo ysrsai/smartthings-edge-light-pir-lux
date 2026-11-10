@@ -20,6 +20,13 @@ local PRESENT_VALUE = 0x0055
 local REPORT_ATTRIBUTES = 0x0A
 local BUTTON_DEDUP_SECONDS = 5
 
+-- The firmware's effective CCT range is approximately 2000-6500 K.
+-- ZCL ColorTemperatureMireds is the inverse value: about 154-500 mired.
+local CCT_MIN_KELVIN = 2000
+local CCT_MAX_KELVIN = 6500
+local CCT_MIN_MIRED = 154
+local CCT_MAX_MIRED = 500
+
 local function light_device_type(device)
   local endpoints = device.zigbee_endpoints
   local ep = endpoints and endpoints[EP_LIGHT]
@@ -134,8 +141,13 @@ local function emit_color_temperature(driver, device, value, zb_rx)
   if zb_rx.address_header.src_endpoint.value ~= EP_LIGHT or type(mireds) ~= "number" or mireds <= 0 or mireds >= 0xFFFF then
     return
   end
+  if mireds < CCT_MIN_MIRED or mireds > CCT_MAX_MIRED then
+    log.warn(string.format("Ignoring out-of-range CCT report: %s mired", tostring(mireds)))
+    return
+  end
 
   local kelvin = math.floor((1000000 / mireds) + 0.5)
+  kelvin = math.max(CCT_MIN_KELVIN, math.min(CCT_MAX_KELVIN, kelvin))
   device:emit_component_event(device.profile.components.main, capabilities.colorTemperature.colorTemperature(kelvin))
 end
 
@@ -214,11 +226,13 @@ end
 
 local function set_color_temperature(driver, device, command)
   local kelvin = command.args.temperature
-  if kelvin == nil or kelvin <= 0 then
+  if type(kelvin) ~= "number" or kelvin < CCT_MIN_KELVIN or kelvin > CCT_MAX_KELVIN then
+    log.warn(string.format("Ignoring out-of-range CCT command: %s K", tostring(kelvin)))
     return
   end
 
   local mireds = math.floor((1000000 / kelvin) + 0.5)
+  mireds = math.max(CCT_MIN_MIRED, math.min(CCT_MAX_MIRED, mireds))
   device:send_to_component("main", ColorControl.server.commands.MoveToColorTemperature(device, mireds, 0, 0, 0))
   device.thread:call_with_delay(1, function()
     device:send_to_component("main", ColorControl.attributes.ColorTemperatureMireds:read(device))
